@@ -27,6 +27,15 @@ from agent.memory_provider import MemoryProvider
 from tools.registry import tool_error
 
 logger = logging.getLogger(__name__)
+_DERIVER_NOISE_PHRASES = (
+    "nothing to save",
+    "no new information",
+    "no information",
+    "no relevant information",
+    "nothing relevant",
+    "nothing notable",
+)
+
 
 
 # ---------------------------------------------------------------------------
@@ -673,7 +682,10 @@ class HonchoMemoryProvider(MemoryProvider):
             dialectic_result = ""
 
         if dialectic_result and dialectic_result.strip():
-            parts.append(dialectic_result)
+            normalized = dialectic_result.strip().lower()
+            is_deriver_noise = any(normalized.startswith(p) for p in _DERIVER_NOISE_PHRASES)
+            if not is_deriver_noise:
+                parts.append(f"## Honcho Contextual Analysis\n{dialectic_result.strip()}")
 
         if not parts:
             return ""
