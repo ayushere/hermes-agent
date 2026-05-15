@@ -993,6 +993,7 @@ class HonchoMemoryProvider(MemoryProvider):
     # stale user-model context from derailing one-word replies.
     _TRIVIAL_PROMPT_RE = re.compile(
         r'^(yes|no|ok|okay|sure|thanks|thank you|y|n|yep|nope|yeah|nah|'
+        r'hi|hey|hello|yo|sup|'
         r'continue|go ahead|do it|proceed|got it|cool|nice|great|done|next|lgtm|k)$',
         re.IGNORECASE,
     )

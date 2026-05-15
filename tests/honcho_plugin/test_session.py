@@ -1200,7 +1200,7 @@ class TestDialecticCadenceAdvancesOnSuccess:
         provider._turn_count = 5
         provider._last_dialectic_turn = 0  # would fire (5 - 0 = 5 ≥ 3)
 
-        provider.queue_prefetch("hello")
+        provider.queue_prefetch("what are my preferences?")
         # wait for the background thread to settle
         if provider._prefetch_thread:
             provider._prefetch_thread.join(timeout=2.0)
@@ -1217,7 +1217,7 @@ class TestDialecticCadenceAdvancesOnSuccess:
         provider._turn_count = 5
         provider._last_dialectic_turn = 0
 
-        provider.queue_prefetch("hello")
+        provider.queue_prefetch("what are my preferences?")
         if provider._prefetch_thread:
             provider._prefetch_thread.join(timeout=2.0)
 
@@ -1242,7 +1242,7 @@ class TestDialecticCadenceAdvancesOnSuccess:
         provider._prefetch_thread = fresh
         provider._prefetch_thread_started_at = _time.monotonic()  # fresh start
 
-        provider.queue_prefetch("hello")
+        provider.queue_prefetch("what are my preferences?")
         # Should have short-circuited — no new dialectic call
         assert provider._manager.dialectic_query.call_count == 0
         hold.set()
@@ -1366,7 +1366,7 @@ class TestDialecticLiveness:
         # timeout=2.0, multiplier=2.0, so anything older than 4s is stale
         p._prefetch_thread_started_at = 0.0  # very old (1970 monotonic baseline)
 
-        p.queue_prefetch("hello")
+        p.queue_prefetch("what are my preferences?")
         # New thread should have been spawned since stuck one is stale
         assert p._prefetch_thread is not stuck, "stale thread must be recycled"
         if p._prefetch_thread:
@@ -1433,7 +1433,7 @@ class TestDialecticLiveness:
         p._last_dialectic_turn = 0
         p._manager.dialectic_query.return_value = "real output"
 
-        p.queue_prefetch("hello")
+        p.queue_prefetch("what are my preferences?")
         if p._prefetch_thread:
             p._prefetch_thread.join(timeout=2.0)
         assert p._dialectic_empty_streak == 0
@@ -1446,7 +1446,7 @@ class TestDialecticLiveness:
         p._last_dialectic_turn = 0
         p._manager.dialectic_query.return_value = ""  # empty
 
-        p.queue_prefetch("hello")
+        p.queue_prefetch("what are my preferences?")
         if p._prefetch_thread:
             p._prefetch_thread.join(timeout=2.0)
         assert p._dialectic_empty_streak == 1
@@ -1536,11 +1536,12 @@ class TestDialecticLifecycleSmoke:
         assert mgr.dialectic_query.call_count == 1
 
         # ---- turn 1: consume prewarm, no duplicate dialectic ----
-        provider.on_turn_start(1, "hey")
-        inject1 = provider.prefetch("hey")
+        turn1_q = "what do you know about me?"
+        provider.on_turn_start(1, turn1_q)
+        inject1 = provider.prefetch(turn1_q)
         assert "prewarm" in inject1, "turn 1 must surface prewarm"
-        provider.sync_turn("hey", "hi there")
-        provider.queue_prefetch("hey")  # cadence gate: (1-0)<3 → skip
+        provider.sync_turn(turn1_q, "hi there")
+        provider.queue_prefetch(turn1_q)  # cadence gate: (1-0)<3 → skip
         self._await_thread(provider)
         assert mgr.dialectic_query.call_count == 1, \
             "turn 1 must not fire — prewarm covered it and cadence skips"

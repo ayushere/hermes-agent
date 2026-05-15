@@ -189,6 +189,8 @@ from agent.trajectory import (
     convert_scratchpad_to_think, has_incomplete_scratchpad,
     save_trajectory as _save_trajectory_to_file,
 )
+from utils import atomic_json_write, base_url_host_matches, base_url_hostname, env_var_enabled, normalize_proxy_url
+from hermes_cli.config import cfg_get
 
 _RE_TRIVIAL_USER_QUERY = re.compile(
     r'^(yes|no|ok|okay|sure|thanks|thank you|y|n|yep|nope|yeah|nah|'
@@ -209,9 +211,6 @@ def _is_trivial_user_query(query: str) -> bool:
     if stripped.startswith("/"):
         return True
     return bool(_RE_TRIVIAL_USER_QUERY.match(stripped))
-from utils import atomic_json_write, base_url_host_matches, base_url_hostname, env_var_enabled, normalize_proxy_url
-from hermes_cli.config import cfg_get
-
 
 
 class _SafeWriter:
